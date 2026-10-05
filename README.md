@@ -8,19 +8,20 @@ El enunciado completo está en la página del curso:
 <https://cardel.github.io/notasUniversidad/2026-II/Estructuras%20de%20Datos/Proyecto/Proyecto%20del%20curso/>
 
 ## Integrantes del grupo
-
+Juan Felipe Duran Chaparro
+Carlos Eduardo Rojas Meme
 Reemplacen esta tabla con sus datos. **Si falta el archivo, o le falta
 el nombre, el código o el correo de algún integrante, la entrega pierde
 el 20 % de la nota**; quien no aparezca aquí no cuenta como integrante y
 su nota del proyecto es 0.0.
 
 | Nombre completo | Código | Correo institucional | Usuario de GitHub |
-|---|---|---|---|
-|  |  |  |  |
+|Juan Felipe Duran Chaparro|9035667|pipedu26@javerianacali.edu.co|pipedu26|
+|Carlos Eduardo Rojas Meme|9033707|carloseduardorojas1@javerianacali.edu.co|CarlosRojas90|
 |  |  |  |  |
 |  |  |  |  |
 
-**Escenario escogido:** (A inventario / B frecuencias / C turnos / D índice)
+**Escenario escogido:** (A inventario )
 
 - Estructura escrita desde cero:
 - Estructura de la biblioteca contra la que se compara:
