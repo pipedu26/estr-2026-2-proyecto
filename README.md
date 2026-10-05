@@ -15,9 +15,10 @@ el nombre, el código o el correo de algún integrante, la entrega pierde
 el 20 % de la nota**; quien no aparezca aquí no cuenta como integrante y
 su nota del proyecto es 0.0.
 
-|      Nombre completo     | Código|          Correo instituciona           | Usuario de GitHub |
-|Juan Felipe Duran Chaparro|9035667|pipedu26@javerianacali.edu.co           |pipedu26           |
-|Carlos Eduardo Rojas Meme |9033707|carloseduardorojas1@javerianacali.edu.co|CarlosRojas90      |
+| Nombre completo| Código | Correo instituciona | Usuario de GitHub |
+| --- | --- | --- | --- |
+| Juan Felipe Duran Chaparro | 9035667 | pipedu26@javerianacali.edu.co | pipedu26 |
+| Carlos Eduardo Rojas Meme | 9033707 | carloseduardorojas1@javerianacali.edu.co | CarlosRojas90 |
 
 **Escenario escogido:** (A inventario )
 
