@@ -13,6 +13,7 @@ El enunciado completo está en la página del curso:
 | --- | --- | --- | --- |
 | Juan Felipe Duran Chaparro | 9035667 | pipedu26@javerianacali.edu.co | pipedu26 |
 | Carlos Eduardo Rojas Meme | 9033707 | carloseduardorojas1@javerianacali.edu.co | CarlosRojas90 |
+| Federico Galvez Gomez | 9035583 | | |
 
 **Escenario escogido:** (A inventario )
 
