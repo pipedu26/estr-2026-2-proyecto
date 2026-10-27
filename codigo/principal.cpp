@@ -1,4 +1,4 @@
-// Autores: Nombre1 Codigo1, Nombre2 Codigo2, Nombre3 Codigo3
+// Autores: Juan Felipe Duran Chaparro  9035667, Carlos Eduardo Rojas Meme  9033707, Federico Galvez Gomez 9035583
 #include <cstdio>
 
 struct Nodo{
@@ -65,6 +65,52 @@ void agregarProducto(Nodo*& frente,Nodo*& final, Nodo* nuevo){
     }
 }
 
+void eliminarProducto(Nodo*& frente, Nodo*& final, int codigo){
+    Nodo* anterior = nullptr;     
+    Nodo* actual = frente;        
+    // recorremos hasta encontrar el codigo o llegar al final de la lista.
+   
+    while(actual != nullptr && actual->codigo != codigo){
+        anterior = actual;
+        actual = actual->siguienteProducto;
+    }
+    
+    if(actual == nullptr){
+        printf("no existe\n");
+    }
+    else{
+        if(anterior == nullptr){
+            // es el primer nodo. no hay nadie antes, asi que "frente" pasa al segundo.
+            frente = actual->siguienteProducto;
+        }
+        else{
+            // esta en el medio o al final. El de atras se salta a "actual" y apunta al que sigue.
+            anterior->siguienteProducto = actual->siguienteProducto;
+        }
+        if(actual == final){
+            // si la lista tenia un solo nodo, anterior es nullptr y la lista queda vacia.
+            final = anterior;
+        }
+        delete actual;            
+        printf("ok\n");
+    }
+}
+void consultarProducto(Nodo* frente, int codigo){
+    Nodo* actual = frente;        
+
+    while(actual != nullptr && actual->codigo != codigo){
+        actual = actual->siguienteProducto;
+    }
+    if(actual == nullptr){
+        printf("no existe\n");
+    }
+    else{
+        printf("%d %s %d\n",actual->codigo,actual->nombre,actual->cantidadDisponible);
+    }
+}
+
+
+
 int main() {
     int cantidadOrdenes = 0;
     scanf("%d",&cantidadOrdenes);
@@ -81,13 +127,17 @@ int main() {
             Nodo* producto = crearProducto(codigo,nombre,cantidadDisponible);
             agregarProducto(frenteLista,finalLista,producto);
         }
-        if (comparacionPalabraOperacion(operacion,"ELIMINAR")){ //Faltan estas logicas----------------------------
-
+        if (comparacionPalabraOperacion(operacion,"ELIMINAR")){ 
+			int codigo = 0;
+			scanf("%d",&codigo);
+			eliminarProducto(frenteLista,finalLista,codigo)
         }
         if (comparacionPalabraOperacion(operacion,"CONSULTAR")){
-
+			int codigo = 0;
+			scanf("%d",&codigo);
+			consultarProducto(frenteLista,codigo);
         }
-        if (comparacionPalabraOperacion(operacion,"REPONER")){
+        if (comparacionPalabraOperacion(operacion,"REPONER")){//Faltan estas logicas----------------------------
 
         }
         if (comparacionPalabraOperacion(operacion,"LISTAR")){

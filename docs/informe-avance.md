@@ -23,9 +23,13 @@ Thareja capítulo X, o CLRS 4.ª ed. capítulo Y.)
 
 Costos esperados, con $n$ el número de elementos:
 
-| Operación | Tiempo | Espacio |
+| Operación | Tiempo (peor caso) | Espacio adicional |
 |---|---|---|
-|  | $O(1)$ | $O(1)$ |
+| Agregar | $O(n)$: la búsqueda del código repetido domina; enlazar al final es $O(1)$ | $O(1)$ |
+| Eliminar | $O(n)$ | $O(1)$ |
+| Consultar | $O(n)$ | $O(1)$ |
+| Reponer | $O(n)$ | $O(1)$ |
+| Listar | $\Theta(n)$ | $O(1)$ |
 
 El invariante de la estructura, como fórmula:
 
@@ -43,13 +47,16 @@ flowchart LR
 (Qué entrada van a variar, entre qué tamaños, y qué esperan ver.)
 
 ## 5. Casos de prueba
-
+ 
+En este avance están implementadas "ELIMINAR" y "CONSULTAR" (además de "AGREGAR", que ya estaba), así que los casos prueban esas dos operaciones. En la columna «Salida obtenida» faltan las líneas "ok" de "AGREGAR", porque "agregarProducto" todavía no las imprime; "REPONER" y "LISTAR" también están pendientes. Las demás líneas coinciden con lo esperado.
+ 
 | Caso | Entrada | Salida esperada | Salida obtenida |
 |---|---|---|---|
-| funcional 1 |  |  |  |
-| funcional 2 |  |  |  |
-| funcional 3 |  |  |  |
-| límite |  |  |  |
+| funcional 1 (consultar un código que está y otro que no) | 3<br>AGREGAR 1004512 arroz 20<br>CONSULTAR 1004512<br>CONSULTAR 999 | ok<br>1004512 arroz 20<br>no existe | 1004512 arroz 20<br>no existe |
+| funcional 2 (eliminar el primero) | 5<br>AGREGAR 1 pan 10<br>AGREGAR 2 leche 4<br>ELIMINAR 1<br>CONSULTAR 1<br>CONSULTAR 2 | ok<br>ok<br>ok<br>no existe<br>2 leche 4 | ok<br>no existe<br>2 leche 4 |
+| funcional 3 (eliminar el último y volver a agregar) | 7<br>AGREGAR 10 sal 3<br>AGREGAR 20 ron 4<br>AGREGAR 30 te 5<br>ELIMINAR 30<br>AGREGAR 40 cafe 6<br>CONSULTAR 40<br>CONSULTAR 30 | ok<br>ok<br>ok<br>ok<br>ok<br>40 cafe 6<br>no existe | ok<br>40 cafe 6<br>no existe |
+| límite 1 (lista vacía y un solo elemento) | 7<br>ELIMINAR 5<br>CONSULTAR 5<br>AGREGAR 9 x 1<br>ELIMINAR 9<br>CONSULTAR 9<br>AGREGAR 8 y 2<br>CONSULTAR 8 | no existe<br>no existe<br>ok<br>ok<br>no existe<br>ok<br>8 y 2 | no existe<br>no existe<br>ok<br>no existe<br>8 y 2 |
+| límite 2 (eliminar un nodo del medio) | 6<br>AGREGAR 1 a 1<br>AGREGAR 2 b 2<br>AGREGAR 3 c 3<br>ELIMINAR 2<br>CONSULTAR 2<br>CONSULTAR 3 | ok<br>ok<br>ok<br>ok<br>no existe<br>3 c 3 | ok<br>no existe<br>3 c 3 |
 
 (El caso límite es la estructura vacía, con un solo elemento, llena, o
 con la clave repetida: digan cuál escogieron y por qué.)
