@@ -109,6 +109,27 @@ void consultarProducto(Nodo* frente, int codigo){
     }
 }
 
+void reponerProducto(Nodo* frente, int codigo, int cantidadAgregar){
+    Nodo* actual = frente;
+    bool encontrado = false;
+
+    while(actual != nullptr && !encontrado){
+        if(actual->codigo == codigo){
+            actual->cantidadDisponible += cantidadAgregar;
+            encontrado = true;
+        }
+        else{
+            actual = actual->siguienteProducto;
+        }
+    }
+
+    if(encontrado){
+        printf("ok\n");
+    }
+    else{
+        printf("no existe\n");
+    }
+}
 
 
 int main() {
@@ -137,10 +158,13 @@ int main() {
 			scanf("%d",&codigo);
 			consultarProducto(frenteLista,codigo);
         }
-        if (comparacionPalabraOperacion(operacion,"REPONER")){//Faltan estas logicas----------------------------
-
+        if (comparacionPalabraOperacion(operacion,"REPONER")){
+			int codigo = 0;
+            int cantidadAgregar = 0;
+            scanf("%d %d", &codigo, &cantidadAgregar);
+            reponerProducto(frenteLista, codigo, cantidadAgregar);
         }
-        if (comparacionPalabraOperacion(operacion,"LISTAR")){
+        if (comparacionPalabraOperacion(operacion,"LISTAR")){//Faltan estas logicas----------------------------
 
         }
 
