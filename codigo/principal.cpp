@@ -131,6 +131,24 @@ void reponerProducto(Nodo* frente, int codigo, int cantidadAgregar){
     }
 }
 
+void listarProductos(Nodo* frente){
+    Nodo* actual = frente;        
+    while(actual != nullptr){     
+        printf("%d %s %d\n",actual->codigo,actual->nombre,actual->cantidadDisponible);
+        actual = actual->siguienteProducto;   // pasamos al siguiente nodo
+    }
+}
+
+void destruirLista(Nodo*& frente, Nodo*& final){
+    while(frente != nullptr){
+        Nodo* siguiente = frente->siguienteProducto;   // guardamos el siguiente antes de borrar este nodo,
+                                                       
+        delete frente;
+        frente = siguiente;                            // avanzamos al nodo que guardamos
+    }
+    final = nullptr;      // frente ya quedo en nullptr al salir del while; final tambien debe quedar vacio
+}
+
 
 int main() {
     int cantidadOrdenes = 0;
@@ -165,11 +183,10 @@ int main() {
             reponerProducto(frenteLista, codigo, cantidadAgregar);
         }
         if (comparacionPalabraOperacion(operacion,"LISTAR")){//Faltan estas logicas----------------------------
-
+			listarProductos(frenteLista);
         }
 
-
-
     }
+	destruirLista(frenteLista,finalLista);
     return 0;
 }

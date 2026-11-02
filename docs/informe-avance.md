@@ -41,6 +41,34 @@ Un diagrama del estado de la estructura, en Mermaid:
 flowchart LR
   n1["dato 7"] --> n2["dato 3"] --> n3["dato 9"] --> nil["NULL"]
 ```
+## 3.2 Costo operativo
+
+Usamos $n$ para el número de productos y miramos el **peor caso**: el producto buscado está de último, o no está.
+ 
+| Operación | Tiempo (peor caso) | Espacio adicional |
+|---|---|---|
+| Agregar | $O(n)$: la búsqueda del código repetido domina; enlazar al final es $O(1)$ | $O(1)$ |
+| Eliminar | $O(n)$ | $O(1)$ |
+| Consultar | $O(n)$ | $O(1)$ |
+| Reponer | $O(n)$ | $O(1)$ |
+| Listar | $\Theta(n)$ | $O(1)$ |
+ 
+**Por qué es lineal.** Para buscar un código se revisan los nodos uno por uno. Revisar un nodo (comparar el código y pasar al siguiente) cuesta siempre lo mismo, digamos $a$ pasos, y lo que se hace fuera del ciclo cuesta otra cantidad fija $b$. En el peor caso se revisan los $n$ nodos:
+ 
+$$T(n) = a\,n + b$$
+ 
+Para $n \geq 1$ se cumple $T(n) \leq (a+b)\,n$. Entonces, con los testigos $c = a+b$ y $n_0 = 1$, 
+tenemos $T(n) \in O(n)$.
+ 
+`Eliminar`, `Consultar` y `Reponer` recorren la lista hasta encontrar el código, 
+y después hacen una cantidad fija de trabajo (cambiar apuntadores, imprimir o sumar), 
+así que cuestan $O(n)$. `Agregar` primero busca si el código ya existe ($O(n)$) y después enlaza al final ($O(1)$), 
+por eso su costo total es $O(n)$. `Listar` siempre recorre todos los nodos, ni más ni menos, 
+así que tarda $\Theta(n)$ tanto en el mejor como en el peor caso.
+ 
+**Espacio.** El espacio adicional es $O(1)$ porque solo se usan unas pocas variables auxiliares (`anterior`, `actual`, `siguiente`) y su cantidad no depende de $n$. 
+La estructura completa ocupa $\Theta(n)$, un nodo por producto. 
+`eliminarProducto` libera con `delete` el nodo que quita y `destruirLista` libera todos los que quedan al terminar el programa, para que no haya fugas de memoria.
 
 ## 4. Qué piensan medir
 

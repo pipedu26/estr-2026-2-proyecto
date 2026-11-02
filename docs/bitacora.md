@@ -23,7 +23,15 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 - Qué hicimos: Adelanto del informe tabla de casos de prueba y costos esperados. Trabaje en las funciones eliminarProducto y consultarProducto. eliminarProducto maneja los tres casos, actualiza final cuando se borra el último nodo y escribe "ok" o "no existe". 
 				consultarProducto recorre la lista y escribe código, nombre y cantidad, o "no existe". En el main completé la lógica de ELIMINAR y de CONSULTAR, que llaman a esas dos funciones.
 - Qué quedó pendiente: Queda pendiente avanzar en las partes de "REPONER" y "LISTAR" y avanzar en el informe sobre la estructura que escogimos y porque.
+
 ## 2026-10-27
+
 - Quiénes: Juan Felipe Durán Chaparro
 - Qué hicimos: Implementé la función `reponerProducto` para la lista enlazada, la cual permite buscar un artículo por su código e incrementar su cantidad disponible. Agregué las validaciones de salida ("ok" o "no existe") según el enunciado e integré la lectura de argumentos y la llamada a la función dentro de la estructura principal (`main`). 
 - Qué quedó pendiente: Queda pendiente implementar las funciones `listarProductos` y `destruirLista`, crear los casos de prueba en `datos/` y completar la justificación teórica en el informe de avance.
+
+## 2026-11-02
+
+- Quiénes: Federico Galvez
+- Qué hicimos: Implementacion de `listarProductos` y `destruirLista`, escritura de costo operativo de la funciones del codigo,
+- Qué quedó pendiente:crear los casos de prueba en `datos/` y completar la justificación teórica en el informe de avance.
