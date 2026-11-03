@@ -73,6 +73,7 @@ La estructura completa ocupa $\Theta(n)$, un nodo por producto.
 ## 4. Qué piensan medir
 
 (Qué entrada van a variar, entre qué tamaños, y qué esperan ver.)
+Lo que pensamos medir es como el tiempo de ejecucion cambia cuando cambiamos y aumentamos la cantidad de productos
 
 ## 5. Casos de prueba
  
