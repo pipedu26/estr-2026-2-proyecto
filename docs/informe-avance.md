@@ -122,6 +122,11 @@ Si lo medido no coincide con lo que predijimos, lo vamos a explicar en el inform
 porque siempre se agrega al final. En la tabla hash sale cubeta por cubeta, y dentro de cada cubeta en orden de llegada, así que puede salir distinto. En `std::map` sale de menor a mayor código. 
 Si queremos el mismo orden en las estructuras, hay que ordenar la salida con el mismo criterio en todas (por ejemplo, por código antes de escribir) o guardar un número de llegada en cada producto.
 
+
+(Qué entrada van a variar, entre qué tamaños, y qué esperan ver.)
+Lo que pensamos medir es como el tiempo de ejecucion cambia cuando cambiamos y aumentamos la cantidad de productos
+
+
 ## 5. Casos de prueba
  
 En este avance están implementadas "ELIMINAR" y "CONSULTAR" (además de "AGREGAR", que ya estaba), así que los casos prueban esas dos operaciones. En la columna «Salida obtenida» faltan las líneas "ok" de "AGREGAR", porque "agregarProducto" todavía no las imprime; "REPONER" y "LISTAR" también están pendientes. Las demás líneas coinciden con lo esperado.
@@ -137,4 +142,4 @@ En este avance están implementadas "ELIMINAR" y "CONSULTAR" (además de "AGREGA
 (El caso límite es la estructura vacía, con un solo elemento, llena, o
 con la clave repetida: digan cuál escogieron y por qué.)
 
-En este caso, como límite decidimos la estructura vacía, ya que nos permite observar cómo se comporta el inventario cuando no hay productos. Principalmente las opciones de CONSULTAR, LISTAR y ELIMINAR, ya que estas tiene que manejar correctamente cuando la lista está vacía y así no acceder a información basura o memoria que no se le pidió.
+En este caso, como límite decidimos la estructura vacía, ya que en el enunciado no establece un limite. Nos permite observar cómo se comporta el inventario cuando no hay productos. Principalmente las opciones de CONSULTAR, LISTAR y ELIMINAR, ya que estas tiene que manejar correctamente cuando la lista está vacía y así no acceder a información basura o memoria que no se le pidió.
