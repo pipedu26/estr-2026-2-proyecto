@@ -13,6 +13,12 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
 ## 2026-11-02
 
+- Quiénes: Federico Galvez
+- Qué hicimos: Finalizacion del informe y cambios al mermail.
+- Qué quedó pendiente: Revision del profesor.
+
+## 2026-11-02
+
 - Quiénes: Carlos Rojas
 - Qué hicimos: Implementacion de POO en el codigo para tener mejor organizado para la proxima entrega y la creacion de los archivos de prueba .in y .out.
 - Qué quedó pendiente:Parte del informe.
