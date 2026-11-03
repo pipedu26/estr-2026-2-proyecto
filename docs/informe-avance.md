@@ -89,4 +89,4 @@ En este avance están implementadas "ELIMINAR" y "CONSULTAR" (además de "AGREGA
 (El caso límite es la estructura vacía, con un solo elemento, llena, o
 con la clave repetida: digan cuál escogieron y por qué.)
 
-En este caso, como límite decidimos la estructura vacía, ya que nos permite observar cómo se comporta el inventario cuando no hay productos. Principalmente las opciones de CONSULTAR, LISTAR y ELIMINAR, ya que estas tiene que manejar correctamente cuando la lista está vacía y así no acceder a información basura o memoria que no se le pidió.
+En este caso, como límite decidimos la estructura vacía, ya que en el enunciado no establece un limite. Nos permite observar cómo se comporta el inventario cuando no hay productos. Principalmente las opciones de CONSULTAR, LISTAR y ELIMINAR, ya que estas tiene que manejar correctamente cuando la lista está vacía y así no acceder a información basura o memoria que no se le pidió.
