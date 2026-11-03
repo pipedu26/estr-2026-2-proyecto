@@ -3,10 +3,37 @@
 
 struct Nodo{
     int codigo = 0;
-    char nombre [21]; //Problema si se ingresan nombre con espacios, por ejemplo aceite de oliva
+    char nombre [21];
     int cantidadDisponible = 0;
     Nodo* siguienteProducto = nullptr;
 };
+
+class Inventario{
+    private:
+        Nodo* frente;
+        Nodo* final;
+        int cantidadNodos;
+
+        bool buscarExistencia(int codigoVerificar);
+
+
+    public:
+        Inventario();
+
+        void agregarProducto(Nodo* nuevo);
+        void eliminarProducto(int codigo);
+        void consultarProducto(int codigo);
+        void reponerProducto(int codigo, int cantidadAgregar);
+        void listarProductos();
+
+        ~Inventario(); //Destructor
+};
+
+Inventario::Inventario(){
+    frente = nullptr;
+    final = nullptr;
+    cantidadNodos = 0;
+}
 
 bool comparacionPalabraOperacion(char operacionUsuario[21],const char operacionPrograma[21]){ //Sin el const char da error porque le esta llegando un valor ya especificado.
     bool coinciden = false;
@@ -35,46 +62,52 @@ Nodo* crearProducto(int codigo, char nombre[21], int cantidadDisponible){
     return producto;
 }
 
-bool buscarExistencia(Nodo* frente, int codigoVerificar){
+bool Inventario::buscarExistencia(int codigoVerificar){
     bool existe = false;
-    while(frente != nullptr && existe != true){
-        int codigoFrente = frente->codigo;
+    Nodo* actual = frente;
+    while(actual != nullptr && existe != true){
+        int codigoFrente = actual->codigo;
         if(codigoFrente == codigoVerificar){
             existe = true;
         }
         else{
-            frente = frente->siguienteProducto;
+            actual = actual->siguienteProducto;
         }
     }
     return existe;
 }
 
-void agregarProducto(Nodo*& frente,Nodo*& final, Nodo* nuevo){
+void Inventario::agregarProducto(Nodo* nuevo){
     if(frente == nullptr){
         frente = nuevo;
         final = nuevo;
+        cantidadNodos = cantidadNodos + 1;
+        printf("ok\n");
     }
     else{
-        if(!buscarExistencia(frente,nuevo->codigo)){
+        if(!buscarExistencia(nuevo->codigo)){
             final->siguienteProducto = nuevo;
             final = nuevo;
+            cantidadNodos = cantidadNodos + 1;
+            printf("ok\n");
         }
         else{
-            printf("repetido");
+            delete nuevo;
+            printf("repetido\n");
         }
     }
 }
 
-void eliminarProducto(Nodo*& frente, Nodo*& final, int codigo){
-    Nodo* anterior = nullptr;     
-    Nodo* actual = frente;        
+void Inventario::eliminarProducto(int codigo){
+    Nodo* anterior = nullptr;
+    Nodo* actual = frente;
     // recorremos hasta encontrar el codigo o llegar al final de la lista.
-   
+
     while(actual != nullptr && actual->codigo != codigo){
         anterior = actual;
         actual = actual->siguienteProducto;
     }
-    
+
     if(actual == nullptr){
         printf("no existe\n");
     }
@@ -91,12 +124,13 @@ void eliminarProducto(Nodo*& frente, Nodo*& final, int codigo){
             // si la lista tenia un solo nodo, anterior es nullptr y la lista queda vacia.
             final = anterior;
         }
-        delete actual;            
+        delete actual;
+        cantidadNodos = cantidadNodos - 1;
         printf("ok\n");
     }
 }
-void consultarProducto(Nodo* frente, int codigo){
-    Nodo* actual = frente;        
+void Inventario::consultarProducto(int codigo){
+    Nodo* actual = frente;
 
     while(actual != nullptr && actual->codigo != codigo){
         actual = actual->siguienteProducto;
@@ -109,13 +143,13 @@ void consultarProducto(Nodo* frente, int codigo){
     }
 }
 
-void reponerProducto(Nodo* frente, int codigo, int cantidadAgregar){
+void Inventario::reponerProducto(int codigo, int cantidadAgregar){
     Nodo* actual = frente;
     bool encontrado = false;
 
     while(actual != nullptr && !encontrado){
         if(actual->codigo == codigo){
-            actual->cantidadDisponible += cantidadAgregar;
+            actual->cantidadDisponible = actual->cantidadDisponible + cantidadAgregar;
             encontrado = true;
         }
         else{
@@ -131,62 +165,61 @@ void reponerProducto(Nodo* frente, int codigo, int cantidadAgregar){
     }
 }
 
-void listarProductos(Nodo* frente){
-    Nodo* actual = frente;        
-    while(actual != nullptr){     
+void Inventario::listarProductos(){
+    Nodo* actual = frente;
+    // printf("Hay %d productos\n", cantidadNodos); Info adicional que no esta en el enunciado
+    while(actual != nullptr){
         printf("%d %s %d\n",actual->codigo,actual->nombre,actual->cantidadDisponible);
         actual = actual->siguienteProducto;   // pasamos al siguiente nodo
     }
 }
 
-void destruirLista(Nodo*& frente, Nodo*& final){
-    while(frente != nullptr){
-        Nodo* siguiente = frente->siguienteProducto;   // guardamos el siguiente antes de borrar este nodo,
-                                                       
-        delete frente;
-        frente = siguiente;                            // avanzamos al nodo que guardamos
-    }
-    final = nullptr;      // frente ya quedo en nullptr al salir del while; final tambien debe quedar vacio
-}
+Inventario::~Inventario(){
+    Nodo* actual = frente;
+    Nodo* siguiente = nullptr;
 
+    while(actual != nullptr){
+        siguiente = actual->siguienteProducto;
+        delete actual;
+        actual = siguiente;
+    }
+}
 
 int main() {
     int cantidadOrdenes = 0;
     scanf("%d",&cantidadOrdenes);
-    Nodo* frenteLista = nullptr;
-    Nodo* finalLista = nullptr;
+    Inventario inventario;
     for(int i = 0; i<cantidadOrdenes; i++){
         char operacion[21];
-        scanf("%s", operacion);
+        scanf("%20s", operacion);
         //-------------------------"switch"----------------------------
         if (comparacionPalabraOperacion(operacion,"AGREGAR")){
             char nombre[21];
             int codigo = 0, cantidadDisponible = 0;
-            scanf("%d %s %d",&codigo,nombre,&cantidadDisponible);
+            scanf("%d %20s %d",&codigo,nombre,&cantidadDisponible);
             Nodo* producto = crearProducto(codigo,nombre,cantidadDisponible);
-            agregarProducto(frenteLista,finalLista,producto);
+           inventario.agregarProducto(producto);
         }
-        if (comparacionPalabraOperacion(operacion,"ELIMINAR")){ 
+        else if (comparacionPalabraOperacion(operacion,"ELIMINAR")){
 			int codigo = 0;
 			scanf("%d",&codigo);
-			eliminarProducto(frenteLista,finalLista,codigo)
+			inventario.eliminarProducto(codigo);
         }
-        if (comparacionPalabraOperacion(operacion,"CONSULTAR")){
+        else if (comparacionPalabraOperacion(operacion,"CONSULTAR")){
 			int codigo = 0;
 			scanf("%d",&codigo);
-			consultarProducto(frenteLista,codigo);
+			inventario.consultarProducto(codigo);
         }
-        if (comparacionPalabraOperacion(operacion,"REPONER")){
+        else if (comparacionPalabraOperacion(operacion,"REPONER")){
 			int codigo = 0;
             int cantidadAgregar = 0;
             scanf("%d %d", &codigo, &cantidadAgregar);
-            reponerProducto(frenteLista, codigo, cantidadAgregar);
+            inventario.reponerProducto(codigo, cantidadAgregar);
         }
-        if (comparacionPalabraOperacion(operacion,"LISTAR")){//Faltan estas logicas----------------------------
-			listarProductos(frenteLista);
+        else if (comparacionPalabraOperacion(operacion,"LISTAR")){
+			inventario.listarProductos();
         }
 
     }
-	destruirLista(frenteLista,finalLista);
     return 0;
 }
