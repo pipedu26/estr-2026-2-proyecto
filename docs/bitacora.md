@@ -5,7 +5,7 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
-## 2026-11-26
+## 2026-11-16
 
 - Quiénes: Carlos Rojas
 - Qué hicimos: Cambio de chat por string en los nombres, Cambio de buscarProductos para que devuelva un nodo y no un bool y asi optimizar 4 funciones que antes hacian esa busqueda.
