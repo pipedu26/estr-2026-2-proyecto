@@ -4,6 +4,11 @@ Va en `docs/`, como los informes.
 
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
+## 2026-11-16
+
+- Quiénes: Juan Felipe Durán Chaparro
+- Qué hicimos: Corregí el informe de avance (`docs/informe-avance.md`) atendiendo la retroalimentación: agregué la cita formal al texto guía (CLRS 4.ª ed. sec. 10.2 y Thareja cap. 6) en la sección 3[cite: 10], corregí el invariante estructural de la lista enlazada (frente, final y cantidadNodos)[cite: 10], ajusté el diagrama Mermaid con el estado real del inventario[cite: 10], actualicé la referencia al destructor `~Inventario`[cite: 10] y alineé la tabla de casos de prueba de la sección 5 con las salidas reales obtenidas por el programa[cite: 10].
+- Qué quedó pendiente: Completar los métodos faltantes de la tabla hash en `principal.cpp` (`consultarProducto`, `reponerProducto` y `listarProductos`)[cite: 16], corregir la lectura de nombres largos[cite: 10], ejecutar los experimentos de rendimiento y redactar el informe final[cite: 4, 13].
 
 ## 2026-11-16
 
