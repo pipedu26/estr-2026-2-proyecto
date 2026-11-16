@@ -12,7 +12,7 @@ El enunciado completo está en la página del curso:
 | Nombre completo| Código | Correo instituciona | Usuario de GitHub |
 | --- | --- | --- | --- |
 | Juan Felipe Duran Chaparro | 9035667 | pipedu26@javerianacali.edu.co | pipedu26 |
-| Carlos Eduardo Rojas Meme | 9033707 | carloseduardorojas1@javerianacali.edu.co | CarlosRojas90 |
+| Carlos Eduardo Rojas Neme | 9033707 | carloseduardorojas1@javerianacali.edu.co | CarlosRojas90 |
 | Federico Galvez Gomez | 9035583 | Ch7201@javerianacali.edu.co | Feezd7 |
 
 **Escenario escogido:** (A inventario )
