@@ -17,8 +17,8 @@ El enunciado completo está en la página del curso:
 
 **Escenario escogido:** (A inventario )
 
-- Estructura escrita desde cero:
-- Estructura de la biblioteca contra la que se compara:
+- Estructura escrita desde cero: Lista enlazada simple (Avance) y Tabla hash con encadenamiento (Final)
+- Estructura de la biblioteca contra la que se compara: std::map
 
 ## Lo primero
 
