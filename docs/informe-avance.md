@@ -1,41 +1,46 @@
 # Informe del avance
 
-*(Borren los comentarios entre paréntesis al escribir.)*
-
 ## 1. El escenario
 
-El escenario que escogimos fue el A, el cual trata sobre el inventario de una tienda y tenemos que hacer un programa para manejar un inventario. Los productos se identifican por código y se debe permitir modificar y consultar información, por medio de las siguientes funciones: Agregar, Eliminar, Consultar, Reponer, Listar. Con este programa el dueño de una tienda va a poder tener todo su inventario organizado para poder saber que productos tienen disponibilidad y así saber cuáles ofrecer. 
+El escenario escogido es el **A**, el cual trata sobre el inventario de una tienda. El programa administra un catálogo de artículos identificados por un código entero único, un nombre (palabra sin espacios) y una cantidad disponible. A partir de órdenes leídas desde la entrada estándar, el sistema permite modificar y consultar el estado del inventario mediante cinco operaciones: `AGREGAR`, `ELIMINAR`, `CONSULTAR`, `REPONER` y `LISTAR`. Con esta herramienta, el encargado de la tienda puede mantener el registro actualizado de sus existencias, verificar disponibilidad inmediata y reabastecer productos de forma controlada.
 
 ## 2. Qué guarda la estructura y qué operaciones necesita
+
+Cada nodo de la estructura almacena la información completa de un artículo (`codigo`, `nombre` y `cantidadDisponible`) junto con el apuntador `siguienteProducto` hacia el siguiente elemento de la secuencia.
+
 | Operación | Qué hace | Precondición |
 |---|---|---|
-| Agregar | Recibe código, nombre, cantidad disponible y agrega ese producto al inventario. | Agrega el producto solo si no hay ningún producto con el mismo código. |
-| Eliminar | Quita un producto usando el código. | Debe existir el producto con el código indicado para poder ser borrado. |
-| Consultar | Se busca un producto con el código indicado y si existe se muestra su código, nombre y cantidad existente. | Debe existir el producto con el código indicado para poder mostrar su información. |
-| Reponer | Aumenta la cantidad de productos disponibles, recibe código y la cantidad de productos que se van a adicionar. | Debe existir el producto con el código indicado para poder modificar su cantidad. |
-| Listar | Muestra todos los productos existentes en el inventario y escribe un producto por línea. | No requiere que exista algún producto en el inventario. |
+| `AGREGAR` | Recibe código, nombre y cantidad disponible; inserta el producto al final del inventario y escribe `ok`. | No debe existir otro producto con el mismo código; si existe, escribe `repetido` y no lo inserta. |
+| `ELIMINAR` | Busca un producto por su código, lo remueve del inventario, libera su memoria y escribe `ok`. | Debe existir el producto con el código indicado; si no existe, escribe `no existe`. |
+| `CONSULTAR` | Busca un producto por su código y muestra `codigo nombre cantidad`. | Debe existir el producto con el código indicado; si no existe, escribe `no existe`. |
+| `REPONER` | Recibe un código y una cantidad a adicionar, incrementa las unidades disponibles del producto y escribe `ok`. | Debe existir el producto con el código indicado; si no existe, escribe `no existe`. |
+| `LISTAR` | Recorre todo el inventario y muestra un producto por línea en formato `codigo nombre cantidad`. | No requiere que existan productos previos (si está vacía, no escribe líneas). |
 
-## 3. ¿Como es la estructura?
+## 3. ¿Cómo es la estructura?
 
-(Por qué esa y no la otra, en términos del orden en que entran y salen
-los elementos y de lo que cuesta cada operación. Citen el texto guía:
-Thareja capítulo X, o CLRS 4.ª ed. capítulo Y.)
+Para este avance se implementó una **lista enlazada simple** encapsulada dentro de la clase `Inventario`, con punteros al primer nodo (`frente`), al último nodo (`final`) y un contador de elementos (`cantidadNodos`).
 
-Costos esperados, con $n$ el número de elementos:
+### 3.1 Justificación de la estructura
 
-| Operación | Tiempo (peor caso) | Espacio adicional |
-|---|---|---|
-| Agregar | $O(n)$: la búsqueda del código repetido domina; enlazar al final es $O(1)$ | $O(1)$ |
-| Eliminar | $O(n)$ | $O(1)$ |
-| Consultar | $O(n)$ | $O(1)$ |
-| Reponer | $O(n)$ | $O(1)$ |
-| Listar | $\Theta(n)$ | $O(1)$ |
+En primer lugar, se analizó el patrón de acceso de las operaciones:
 
-El invariante de la estructura, como fórmula:
+- **Descarte de pilas y colas:** En una pila (LIFO) solo se accede al último elemento insertado y en una cola (FIFO) únicamente al primero. En un inventario los clientes y el encargado consultan, reponen o eliminan cualquier artículo según su código sin importar el momento en que ingresó, por lo que restringir el acceso a los extremos no resuelve el problema.
+- **Lista enlazada simple frente a arreglo:** Un arreglo requiere reservar un bloque contiguo de capacidad fija o realizar copias completas de tamaño $O(n)$ cada vez que se llena. Además, eliminar un elemento intermedio en un arreglo obliga a desplazar hasta $n - 1$ elementos posteriores. En la lista enlazada simple cada producto se reserva dinámicamente con `new` al momento de llegar, y la eliminación solo requiere redirigir el apuntador del nodo anterior. Gracias al puntero `final`, insertar un nuevo artículo al final se realiza en $O(1)$ una vez verificada su unicidad.
+- **Lista enlazada simple frente a lista doble y lista ordenada:** Una lista doblemente enlazada añade un segundo apuntador por nodo que aumenta el consumo de memoria sin mejorar el costo de búsqueda por código, pues igualmente hay que recorrer desde el inicio. Una lista ordenada obligaría a buscar la posición lexicográfica o numérica en cada inserción, y el enunciado no exige que `LISTAR` entregue los productos ordenados.
+- **Preparación para la entrega final:** Encapsular la lista dentro de `Inventario` permite reutilizar esta misma estructura lineal como cubeta de encadenamiento en la tabla hash de la entrega final, manteniendo exactamente las mismas firmas públicas de los métodos.
 
-$$I:\quad 0 \leq n \leq \text{capacidad}$$
+> **Cita del texto guía:**  
+> De acuerdo con Cormen et al. (*Introduction to Algorithms*, 4.ª ed., Capítulo 10: *Elementary Data Structures*, Sección 10.2: *Linked lists*) y Reema Thareja (*Data Structures Using C*, 2.ª ed., Capítulo 6: *Linked Lists*), la búsqueda de una clave en una lista enlazada simple sin ordenamiento requiere examinar secuencialmente los nodos desde la cabeza, con un tiempo en el peor caso de $\Theta(n)$, mientras que la inserción y el desenlace de un nodo una vez ubicada su posición toman tiempo constante $O(1)$.
 
-Un diagrama del estado de la estructura, en Mermaid:
+### 3.2 Invariante de la estructura
+
+La lista enlazada no tiene una capacidad máxima fija; su integridad estructural se mantiene bajo las siguientes condiciones: `frente` apunta siempre al primer nodo de la secuencia, `final` apunta al último nodo, `cantidadNodos` registra el número exacto de nodos actualmente enlazados ($n \geq 0$), y el último nodo apunta a `nullptr`. Formalmente:
+
+$$I:\quad (n = 0 \iff frente = \text{nullptr} \land final = \text{nullptr}) \;\land\; (n > 0 \implies frente \neq \text{nullptr} \land final \neq \text{nullptr} \land final.\text{siguienteProducto} = \text{nullptr}) \;\land\; \text{cantidadNodos} = n$$
+
+### 3.3 Diagrama del estado de la estructura
+
+Estado de la lista tras agregar dos productos (`1004512 arroz 20` y `1004498 azucar 5`):
 
 ```mermaid
 flowchart LR
@@ -46,100 +51,61 @@ flowchart LR
   end
   fr --> n1["1004512 · arroz · 20"]
   n1 --> n2["1004498 · azucar · 5"]
-  n2 --> nil["NULL"]
+  n2 --> nil["nullptr"]
   fi --> n2
 ```
 
-## 3.2 Juztificacion
+### 3.4 Costo operativo
 
-Primero miramos el orden en que entran y salen los productos. 
-En una pila sale primero el último que entró, y en una cola sale primero el primero que entró. En el inventario no pasa eso: el dueño pide un producto por su código, sin importar cuándo lo agregó, y puede ser cualquiera. Por eso ni la pila ni la cola nos sirven, porque solo dejan sacar por un extremo. Necesitamos una estructura donde se pueda buscar, cambiar y quitar un producto de cualquier posición. Entre las estructuras lineales comparamos un arreglo con una lista enlazada, y elegimos la lista por estas razones:
- 
-1. **No sabemos cuántos productos habrá.** Un arreglo necesita un tamaño fijo, 
-o hay que copiarlo todo a uno más grande cuando se llena. La lista pide memoria con `new` solo para cada producto que llega, así que ocupa justo lo que necesita.
+Sea $n$ el número de productos almacenados en el inventario. En el **peor caso** (el código buscado está en el último nodo o no pertenece a la lista):
 
-2. **Eliminar es barato una vez que se encontró el producto.** En un arreglo, 
-al quitar un producto hay que correr todos los que vienen después (hasta $n-1$ movimientos). 
-En la lista solo se cambia un apuntador: el nodo anterior pasa a apuntar al siguiente del que se borra.
+| Operación | Tiempo (peor caso) | Espacio adicional | Razón |
+|---|---|---|---|
+| `AGREGAR` | $O(n)$ | $O(1)$ | Verifica primero si el código ya existe recorriendo los $n$ nodos ($O(n)$) y luego enlaza el nuevo nodo usando `final` en $O(1)$. |
+| `ELIMINAR` | $O(n)$ | $O(1)$ | Recorre hasta $n$ nodos manteniendo el nodo anterior para reenlazar apuntadores y liberar el nodo con `delete`. |
+| `CONSULTAR` | $O(n)$ | $O(1)$ | Recorre secuencialmente la lista hasta encontrar el código o alcanzar `nullptr`. |
+| `REPONER` | $O(n)$ | $O(1)$ | Realiza búsqueda lineal hasta encontrar el nodo y suma la cantidad en $O(1)$. |
+| `LISTAR` | $\Theta(n)$ | $O(1)$ | Visita exactamente los $n$ nodos de la lista tanto en el mejor como en el peor caso. |
 
-3. **Agregar al final no recorre nada.** Gracias a `final`, enlazar un nodo nuevo al final cuesta $O(1)$.
+**Análisis lineal y testigos:** Revisar un nodo durante el recorrido (comparar su código y avanzar al siguiente apuntador) toma una constante $a$ de operaciones elementales, y las instrucciones fuera del ciclo toman una constante $b$. En el peor caso se examinan los $n$ nodos:
 
-4. **Así lo pide el enunciado.** Para el avance se pide una lista enlazada simple con búsqueda lineal por código, y en la entrega final cada cubeta de la tabla hash será una de estas listas. Además, como la lista queda dentro de la clase `Inventario`, quien la usa solo llama a las operaciones: en la entrega final la tabla hash podrá ofrecer las mismas operaciones con las mismas firmas, y el programa que mide usará una u otra sin cambiar.
-Lo que perdemos: una lista no tiene índices. Para llegar a un producto hay que pasar por todos los anteriores, y por eso la búsqueda por código es lineal. Además, cada nodo guarda un apuntador extra. Para un inventario pequeño o mediano es aceptable; la tabla hash de la entrega final es la que va a mejorar las búsquedas.
- 
-También descartamos otras dos opciones. La lista doblemente enlazada gasta un apuntador más por nodo y ayuda poco, porque de todas formas hay que buscar el código para llegar al nodo. La lista ordenada por código obligaría a recorrerla hasta encontrar el lugar de cada producto nuevo, y el enunciado no pide ningún orden para `LISTAR`.
-
-## 3.3 Costo operativo
-
-Usamos $n$ para el número de productos y miramos el **peor caso**: el producto buscado está de último, o no está.
- 
-| Operación | Tiempo (peor caso) | Espacio adicional |
-|---|---|---|
-| Agregar | $O(n)$: la búsqueda del código repetido domina; enlazar al final es $O(1)$ | $O(1)$ |
-| Eliminar | $O(n)$ | $O(1)$ |
-| Consultar | $O(n)$ | $O(1)$ |
-| Reponer | $O(n)$ | $O(1)$ |
-| Listar | $\Theta(n)$ | $O(1)$ |
- 
-**Por qué es lineal.** Para buscar un código se revisan los nodos uno por uno. Revisar un nodo (comparar el código y pasar al siguiente) cuesta siempre lo mismo, digamos $a$ pasos, y lo que se hace fuera del ciclo cuesta otra cantidad fija $b$. En el peor caso se revisan los $n$ nodos:
- 
 $$T(n) = a\,n + b$$
- 
-Para $n \geq 1$ se cumple $T(n) \leq (a+b)\,n$. Entonces, con los testigos $c = a+b$ y $n_0 = 1$, 
-tenemos $T(n) \in O(n)$.
- 
-`Eliminar`, `Consultar` y `Reponer` recorren la lista hasta encontrar el código, 
-y después hacen una cantidad fija de trabajo (cambiar apuntadores, imprimir o sumar), 
-así que cuestan $O(n)$. `Agregar` primero busca si el código ya existe ($O(n)$) y después enlaza al final ($O(1)$), 
-por eso su costo total es $O(n)$. `Listar` siempre recorre todos los nodos, ni más ni menos, 
-así que tarda $\Theta(n)$ tanto en el mejor como en el peor caso.
- 
-**Espacio.** El espacio adicional es $O(1)$ porque solo se usan unas pocas variables auxiliares (`anterior`, `actual`, `siguiente`) y su cantidad no depende de $n$. 
-La estructura completa ocupa $\Theta(n)$, un nodo por producto. 
-`eliminarProducto` libera con `delete` el nodo que quita y `destruirLista` libera todos los que quedan al terminar el programa, para que no haya fugas de memoria.
+
+Para todo $n \geq 1$, se cumple $a\,n + b \leq (a + b)\,n$. Por lo tanto, $T(n) \in O(n)$ con testigos $c = a + b$ y $n_0 = 1$.
+
+**Espacio:** La estructura ocupa $\Theta(n)$ en memoria dinámica (un objeto `Nodo` por cada artículo registrado). El espacio auxiliar de todas las operaciones es $O(1)$, ya que únicamente emplean un número fijo de punteros locales (`actual`, `anterior`). El método `eliminarProducto` libera con `delete` cada nodo eliminado individualmente y el destructor `~Inventario` recorre y libera todos los nodos restantes al finalizar la ejecución, evitando fugas de memoria.
 
 ## 4. Qué piensan medir
 
-En la entrega final vamos a medir **el tiempo de `CONSULTAR` contra el número de artículos $n$**, y a comparar tres cosas con la misma entrada: la lista enlazada de este avance, la tabla hash con encadenamiento (donde cada cubeta es una lista como la de este avance) y `std::map` como referencia, que se usa solo para medir y no por dentro de nuestras estructuras. En este avance solo dejamos planeada la medición.
- 
-**Qué entrada vamos a variar**
- 
-- **El número de artículos:** $n \in \{1000,\ 2000,\ 4000,\ 8000,\ 16000,\ 32000\}$, con códigos distintos. Son seis tamaños que se duplican, para ver si el tiempo también se duplica (el proyecto pide al menos cinco).
-- **El tamaño $M$ de la tabla hash:** tres valores, uno pequeño (por ejemplo $M = 101$), uno cercano al número de artículos ($M \approx n$) y un primo mayor que $n$ (por ejemplo, el primer primo después de $2n$).
-- **Un cuarto juego de códigos** escogido para que todos caigan en la misma cubeta (por ejemplo, múltiplos de $M$ si la función hash es $c \bmod M$).
-**Cómo lo vamos a medir.** Primero se construye la estructura con $n$ productos (el tiempo de `AGREGAR` no entra en la medición) y después se mide un bloque fijo de consultas, con códigos que existen y con códigos que no existen. El tiempo se toma con `std::chrono::steady_clock`, se repite varias veces y se usa la mediana. Todo se corre en la misma máquina, con el mismo compilador y las mismas banderas. Los tiempos se guardan en `datos/mediciones.csv` y se reportan en una tabla y en una gráfica de Mermaid (`xychart-beta`).
- 
-**Qué esperamos ver.** Con $\alpha = n/M$ el número promedio de nodos por cubeta:
- 
-- **Lista enlazada:** el tiempo crece en línea recta con $n$, $T(n) \approx a\,n + b$, así que al duplicar $n$ el tiempo se duplica. Es lo que predice el costo $O(n)$ de la sección 3.3.
-- **Tabla hash con $M$ pequeño:** cada cubeta tiene unos $n/M$ nodos, así que el tiempo sigue creciendo con $n$, pero mucho más despacio que en la lista.
-- **Tabla hash con $M \approx n$ o con un primo mayor:** $\alpha$ queda cerca de 1 o por debajo, y el tiempo debería quedar casi constante, $O(1+\alpha)$ en promedio (CLRS, capítulo 11).
-- **Cuarto juego de códigos:** todos los códigos caen en una sola cubeta, y la tabla se comporta como la lista, $\Theta(n)$.
-- **`std::map`:** crece como $\log n$, mucho más despacio que la lista.
-Si lo medido no coincide con lo que predijimos, lo vamos a explicar en el informe final.
- 
-**El orden de `LISTAR`.** En la lista sale en el orden de llegada, 
-porque siempre se agrega al final. En la tabla hash sale cubeta por cubeta, y dentro de cada cubeta en orden de llegada, así que puede salir distinto. En `std::map` sale de menor a mayor código. 
-Si queremos el mismo orden en las estructuras, hay que ordenar la salida con el mismo criterio en todas (por ejemplo, por código antes de escribir) o guardar un número de llegada en cada producto.
+En la entrega final se medirá **el tiempo de ejecución de `CONSULTAR` en función del número de artículos $n$**, comparando tres implementaciones sobre exactamente las mismas secuencias de entrada:
 
+1. **Lista enlazada simple** (implementada desde cero en este avance, costo $O(n)$).
+2. **Tabla hash con encadenamiento** (implementada desde cero para la entrega final, donde cada cubeta es una lista enlazada simple y la función hash opera sobre la clave entera).
+3. **`std::map`** (contenedor de la biblioteca estándar de C++, utilizado exclusivamente como curva de referencia, con costo $O(\log n)$).
 
-(Qué entrada van a variar, entre qué tamaños, y qué esperan ver.)
-Lo que pensamos medir es como el tiempo de ejecucion cambia cuando cambiamos y aumentamos la cantidad de productos
+**Variables y escenarios experimentales:**
 
+- **Tamaños de entrada ($n$):** Se evaluarán al menos cinco tamaños crecientes de inventario, duplicando la cantidad de productos en cada paso ($n \in \{1000,\ 2000,\ 4000,\ 8000,\ 16000,\ 32000\}$) para observar la tasa de crecimiento del tiempo.
+- **Tamaños de tabla hash ($M$):** Se probarán tres configuraciones de cubetas: un tamaño pequeño fijo ($M = 101$), un tamaño cercano al número de artículos ($M \approx n$) y un número primo mayor que $n$.
+- **Escenario de colisión total:** Se construirá un cuarto conjunto de claves (múltiplos de $M$ bajo $h(c) = c \bmod M$) diseñado para que todos los artículos caigan en la misma cubeta.
+
+**Protocolo y resultados esperados:** Se poblará cada estructura con $n$ artículos (sin incluir el tiempo de inserción en la medición) y se ejecutará un lote fijo de consultas exitosas y fallidas midiendo con `std::chrono::steady_clock`. Se registrará la mediana de múltiples repeticiones en `datos/mediciones.csv` y se graficará con Mermaid (`xychart-beta`). Se espera que la lista enlazada crezca linealmente ($T(n) \approx a\,n + b$), que `std::map` crezca logarítmicamente, que la tabla hash con $M \approx n$ o primo mayor mantenga tiempo casi constante $O(1 + \alpha)$, y que en el caso de colisión total la tabla hash degrade a $\Theta(n)$ igualando la pendiente de la lista enlazada.
+
+**Orden de salida de `LISTAR`:** En la lista enlazada los artículos se imprimen en orden cronológico de inserción; en la tabla hash salen agrupados por índice de cubeta y dentro de cada cubeta según la política de inserción; y en `std::map` salen ordenados ascendentemente por código. Para garantizar exactamente la misma salida en las tres estructuras, sería necesario ordenar los resultados por código antes de imprimirlos o almacenar un identificador secuencial de llegada.
 
 ## 5. Casos de prueba
- 
-En este avance están implementadas "ELIMINAR" y "CONSULTAR" (además de "AGREGAR", que ya estaba), así que los casos prueban esas dos operaciones. En la columna «Salida obtenida» faltan las líneas "ok" de "AGREGAR", porque "agregarProducto" todavía no las imprime; "REPONER" y "LISTAR" también están pendientes. Las demás líneas coinciden con lo esperado.
- 
+
+Todas las operaciones (`AGREGAR`, `ELIMINAR`, `CONSULTAR`, `REPONER` y `LISTAR`) se encuentran implementadas y verificadas. Los archivos de prueba en la carpeta `datos/` (`funcionales.in` / `funcionales.out` y `limites.in` / `limites.out`) se ejecutan automáticamente desde `codigo/` mediante `make pruebas`.
+
 | Caso | Entrada | Salida esperada | Salida obtenida |
 |---|---|---|---|
-| funcional 1 (consultar un código que está y otro que no) | 3<br>AGREGAR 1004512 arroz 20<br>CONSULTAR 1004512<br>CONSULTAR 999 | ok<br>1004512 arroz 20<br>no existe | 1004512 arroz 20<br>no existe |
-| funcional 2 (eliminar el primero) | 5<br>AGREGAR 1 pan 10<br>AGREGAR 2 leche 4<br>ELIMINAR 1<br>CONSULTAR 1<br>CONSULTAR 2 | ok<br>ok<br>ok<br>no existe<br>2 leche 4 | ok<br>no existe<br>2 leche 4 |
-| funcional 3 (eliminar el último y volver a agregar) | 7<br>AGREGAR 10 sal 3<br>AGREGAR 20 ron 4<br>AGREGAR 30 te 5<br>ELIMINAR 30<br>AGREGAR 40 cafe 6<br>CONSULTAR 40<br>CONSULTAR 30 | ok<br>ok<br>ok<br>ok<br>ok<br>40 cafe 6<br>no existe | ok<br>40 cafe 6<br>no existe |
-| límite 1 (lista vacía y un solo elemento) | 7<br>ELIMINAR 5<br>CONSULTAR 5<br>AGREGAR 9 x 1<br>ELIMINAR 9<br>CONSULTAR 9<br>AGREGAR 8 y 2<br>CONSULTAR 8 | no existe<br>no existe<br>ok<br>ok<br>no existe<br>ok<br>8 y 2 | no existe<br>no existe<br>ok<br>no existe<br>8 y 2 |
-| límite 2 (eliminar un nodo del medio) | 6<br>AGREGAR 1 a 1<br>AGREGAR 2 b 2<br>AGREGAR 3 c 3<br>ELIMINAR 2<br>CONSULTAR 2<br>CONSULTAR 3 | ok<br>ok<br>ok<br>ok<br>no existe<br>3 c 3 | ok<br>no existe<br>3 c 3 |
+| **Funcional 1** (`datos/funcionales.in`: flujo completo de agregar, consultar, reponer, listar y eliminar) | 9<br>AGREGAR 10045 arroz 20<br>CONSULTAR 10045<br>CONSULTAR 1<br>REPONER 10045 5<br>CONSULTAR 10045<br>AGREGAR 10046 leche 6<br>LISTAR<br>ELIMINAR 10045<br>LISTAR | ok<br>10045 arroz 20<br>no existe<br>ok<br>10045 arroz 25<br>ok<br>10045 arroz 25<br>10046 leche 6<br>ok<br>10046 leche 6 | ok<br>10045 arroz 20<br>no existe<br>ok<br>10045 arroz 25<br>ok<br>10045 arroz 25<br>10046 leche 6<br>ok<br>10046 leche 6 |
+| **Funcional 2** (eliminar el primer nodo de la lista) | 5<br>AGREGAR 1 pan 10<br>AGREGAR 2 leche 4<br>ELIMINAR 1<br>CONSULTAR 1<br>CONSULTAR 2 | ok<br>ok<br>ok<br>no existe<br>2 leche 4 | ok<br>ok<br>ok<br>no existe<br>2 leche 4 |
+| **Funcional 3** (eliminar el último nodo y volver a agregar) | 7<br>AGREGAR 10 sal 3<br>AGREGAR 20 ron 4<br>AGREGAR 30 te 5<br>ELIMINAR 30<br>AGREGAR 40 cafe 6<br>CONSULTAR 40<br>CONSULTAR 30 | ok<br>ok<br>ok<br>ok<br>ok<br>40 cafe 6<br>no existe | ok<br>ok<br>ok<br>ok<br>ok<br>40 cafe 6<br>no existe |
+| **Límite 1** (`datos/limites.in`: lista vacía, clave repetida, un solo elemento y nodo intermedio) | 13<br>CONSULTAR 1<br>ELIMINAR 1<br>LISTAR<br>AGREGAR 1 sal 2<br>AGREGAR 1 arroz 9<br>CONSULTAR 1<br>ELIMINAR 1<br>CONSULTAR 1<br>AGREGAR 2 pan 1<br>AGREGAR 3 galletas 2<br>AGREGAR 4 jugo 3<br>ELIMINAR 3<br>LISTAR | no existe<br>no existe<br>ok<br>repetido<br>1 sal 2<br>ok<br>no existe<br>ok<br>ok<br>ok<br>ok<br>2 pan 1<br>4 jugo 3 | no existe<br>no existe<br>ok<br>repetido<br>1 sal 2<br>ok<br>no existe<br>ok<br>ok<br>ok<br>ok<br>2 pan 1<br>4 jugo 3 |
 
-(El caso límite es la estructura vacía, con un solo elemento, llena, o
-con la clave repetida: digan cuál escogieron y por qué.)
+### Justificación de los casos límite seleccionados
 
-En este caso, como límite decidimos la estructura vacía, ya que en el enunciado no establece un limite. Nos permite observar cómo se comporta el inventario cuando no hay productos. Principalmente las opciones de CONSULTAR, LISTAR y ELIMINAR, ya que estas tiene que manejar correctamente cuando la lista está vacía y así no acceder a información basura o memoria que no se le pidió.
+- **Estructura vacía (`CONSULTAR`, `ELIMINAR` y `LISTAR` iniciales en `limites.in`):** Verifica que las operaciones manejen correctamente `frente == nullptr` sin desreferenciar punteros nulos.
+- **Clave repetida (`AGREGAR 1 arroz 9` tras `AGREGAR 1 sal 2`):** Comprueba que se respete la unicidad de códigos, respondiendo `repetido` y conservando intactos los datos del artículo original.
+- **Transición de un solo elemento y eliminación intermedia:** Valida que `frente` y `final` se restablezcan en `nullptr` al borrar el único nodo existente y que se mantenga la continuidad de la lista al borrar el nodo intermedio (`ELIMINAR 3`).
