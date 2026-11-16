@@ -1,4 +1,4 @@
-// Autores: Juan Felipe Duran Chaparro  9035667, Carlos Eduardo Rojas Neme  9033707, Federico Galvez Gomez 9035583
+// Autores: Juan Felipe Duran Chaparro 9035667, Carlos Eduardo Rojas Neme 9033707, Federico Galvez Gomez 9035583
 #include <cstdio>
 #include <string>
 
@@ -11,11 +11,11 @@ struct Nodo{
 
 class Inventario{
     private:
-        Nodo* frente;
-        Nodo* final;
+        Nodo** tablaHash;
+        int capacidadHash;
         int cantidadNodos;
-
-        Nodo* buscarProducto(int codigoVerificar);
+        int funcionHash(int codigo);
+        Nodo* buscarProductoHash(int codigoVerificar);
 
 
     public:
@@ -31,9 +31,107 @@ class Inventario{
 };
 
 Inventario::Inventario(){
-    frente = nullptr;
-    final = nullptr;
+    capacidadHash = 50; //Dependiendo del tamaño que se quiera medir.
     cantidadNodos = 0;
+
+    tablaHash = new Nodo*[capacidadHash]; //Se reserva el espacio para la cantidad que se declaro.
+
+    for(int i = 0; i<capacidadHash; i++){ //Se ponen los apuntadores de cada casilla en nullptr para no tener valores indeterminados.
+        tablaHash[i] = nullptr;
+    }
+}
+
+int Inventario::funcionHash(int codigo){
+    int posicion = codigo % capacidadHash;
+    return posicion;
+}
+
+Nodo* Inventario::buscarProductoHash(int codigoVerificar){
+    int posicion = funcionHash(codigoVerificar);
+    Nodo* actual = tablaHash[posicion];
+
+    while(actual != nullptr && actual->codigo != codigoVerificar){
+        actual = actual->siguienteProducto;
+    }
+    return actual; //Si encuentra el nodo, lo devuelve, pero si no devuelve nullptr
+}
+
+Nodo* crearProducto(int codigo, const std::string& nombre, int cantidadDisponible){ // Se crea el producto con toda su informacion.
+    Nodo* producto = new Nodo;
+    producto->codigo = codigo;
+    producto->nombre = nombre;
+    producto->cantidadDisponible = cantidadDisponible;
+    producto->siguienteProducto = nullptr;
+    return producto;
+}
+
+void Inventario::agregarProducto(Nodo* nuevo){ // Si existe se agrega al principio de la lista de la posicion en la tabla
+    Nodo* existe = buscarProductoHash(nuevo->codigo);
+    int posicionHashCubeta = funcionHash(nuevo->codigo);
+
+    if (existe != nullptr){ //Si existe simplemente se imprime repetido.
+        delete nuevo;
+        printf("repetido\n");
+    }
+    else{ //Si no existe se agrega encima de los nodos de la posicion en la tabla.
+        nuevo->siguienteProducto = tablaHash[posicionHashCubeta]; // Se deja el nuevo producto apuntando al que antes estaba al frente de la lista.
+        tablaHash[posicionHashCubeta] = nuevo; // Se deja el nuevo producto al frente.
+        cantidadNodos = cantidadNodos + 1;
+        printf("ok\n");
+    }
+}
+
+void Inventario::eliminarProducto(int codigo){
+
+    Nodo* existe = buscarProductoHash(codigo);
+    int posicionHashCubeta = funcionHash(codigo);
+
+    if(existe == nullptr){
+        printf("no existe\n");
+    }
+    else{
+        if (tablaHash[posicionHashCubeta] == existe){ // Si el producto que se quiere borrar es el primero de la cubeta, se actualiza el frente para que apunte al siguiente nodo y luego se elimina el producto.
+            tablaHash[posicionHashCubeta] = existe->siguienteProducto;
+            delete existe;
+            cantidadNodos = cantidadNodos - 1;
+            printf("ok\n");
+        }
+        else{
+            Nodo* productoAnterior = tablaHash[posicionHashCubeta]; // Aqui se guarda el frente de la cubeta que luego se va a usar para buscar el producto que se va a borrar.
+            while (productoAnterior->siguienteProducto != existe){ // Se recorre la lista hasta encontrar el nodo donde siguiente apuntador sea el producto que se quiere borrar.
+                productoAnterior = productoAnterior->siguienteProducto;
+            }
+            Nodo* borrar = productoAnterior->siguienteProducto;
+            productoAnterior->siguienteProducto = borrar->siguienteProducto; // Se conecta el producto anterior, con el producto que esta despues del elegido para ser borrado.
+            delete borrar;
+
+            cantidadNodos = cantidadNodos - 1;
+            printf("ok\n");
+        }
+    }
+}
+
+void Inventario::consultarProducto(int codigo){
+    //Para completar con hash
+}
+
+void Inventario::reponerProducto(int codigo, int cantidadAgregar){
+    //Para completar con hash
+}
+
+void Inventario::listarProductos(){
+    //Para completar con hash
+}
+
+Inventario::~Inventario(){
+    for(int i = 0; i < capacidadHash; i++){
+            while(tablaHash[i] != nullptr){
+                Nodo* temporal = tablaHash[i];
+                tablaHash[i] = tablaHash[i]->siguienteProducto;
+                delete temporal;
+            }
+        }
+        delete[] tablaHash;
 }
 
 bool comparacionPalabraOperacion(char operacionUsuario[21],const char operacionPrograma[21]){ //Sin el const char da error porque le esta llegando un valor ya especificado.
@@ -47,126 +145,6 @@ bool comparacionPalabraOperacion(char operacionUsuario[21],const char operacionP
     }
     return coinciden;
 
-}
-
-Nodo* crearProducto(int codigo, const std::string& nombre, int cantidadDisponible){
-    Nodo* producto = new Nodo;
-    producto->codigo = codigo;
-    producto->nombre = nombre;
-    producto->cantidadDisponible = cantidadDisponible;
-    producto->siguienteProducto = nullptr;
-    return producto;
-}
-
-Nodo* Inventario::buscarProducto(int codigoVerificar){
-    Nodo* productoEncontrado = nullptr;
-    Nodo* actual = frente;
-
-    while(actual != nullptr && productoEncontrado == nullptr){
-        if(actual->codigo == codigoVerificar){
-            productoEncontrado = actual;
-        }
-        else{
-            actual = actual->siguienteProducto;
-        }
-    }
-
-    return productoEncontrado;
-}
-
-void Inventario::agregarProducto(Nodo* nuevo){
-    if(frente == nullptr){
-        frente = nuevo;
-        final = nuevo;
-        cantidadNodos = cantidadNodos + 1;
-        printf("ok\n");
-    }
-    else{
-        if(buscarProducto(nuevo->codigo) == nullptr){
-            final->siguienteProducto = nuevo;
-            final = nuevo;
-            cantidadNodos = cantidadNodos + 1;
-            printf("ok\n");
-        }
-        else{
-            delete nuevo;
-            printf("repetido\n");
-        }
-    }
-}
-
-void Inventario::eliminarProducto(int codigo){
-
-    Nodo* actual = buscarProducto(codigo);
-    Nodo* anterior = nullptr;
-
-    if(actual == nullptr){
-        printf("no existe\n");
-    }
-    else{
-        if(actual != frente){
-            anterior = frente;
-
-            while(anterior->siguienteProducto != actual){
-                anterior = anterior->siguienteProducto;
-            }
-            anterior->siguienteProducto = actual->siguienteProducto;
-        }
-        else{
-            frente = actual->siguienteProducto;
-        }
-
-        if(actual == final){
-            final = anterior;
-        }
-
-        delete actual;
-        cantidadNodos = cantidadNodos - 1;
-        printf("ok\n");
-    }
-}
-
-void Inventario::consultarProducto(int codigo){
-    Nodo* actual = buscarProducto(codigo);
-
-    if(actual == nullptr){
-        printf("no existe\n");
-    }
-    else{
-        printf("%d %s %d\n",actual->codigo,actual->nombre.c_str(),actual->cantidadDisponible);
-    }
-}
-
-void Inventario::reponerProducto(int codigo, int cantidadAgregar){
-    Nodo* actual = buscarProducto(codigo);
-
-    if(actual != nullptr){
-        actual->cantidadDisponible = actual->cantidadDisponible + cantidadAgregar;
-        printf("ok\n");
-    }
-    else{
-        printf("no existe\n");
-    }
-}
-
-void Inventario::listarProductos(){
-    Nodo* actual = frente;
-    // printf("Hay %d productos\n", cantidadNodos); Info adicional que no esta en el enunciado
-    while(actual != nullptr){
-        printf("%d %s %d\n",actual->codigo,actual->nombre.c_str(),actual->cantidadDisponible);
-        actual = actual->siguienteProducto;   // pasamos al siguiente nodo
-    }
-}
-
-Inventario::~Inventario(){
-    Nodo* actual = frente;
-    Nodo* siguiente = nullptr;
-
-    while(actual != nullptr){
-        siguiente = actual->siguienteProducto;
-        delete actual;
-        actual = siguiente;
-    }
 }
 
 int main() {
