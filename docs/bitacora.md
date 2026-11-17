@@ -2,6 +2,12 @@
 
 ## 2026-11-16
 
+- Quiénes: Carlos Rojas
+- Qué hicimos: Subida de la parte 4 y 5 del `informe-final.md`.
+- Qué quedó pendiente:  El punto 6.
+
+## 2026-11-16
+
 - Quiénes: Federico Galvez Gomez
 - Qué hicimos: Subida de la parte 1,2 y 3 del `informe-final.md`.
 - Qué quedó pendiente:  El punto 4, 5 y 6 del informe.
