@@ -139,7 +139,15 @@ void Inventario::reponerProducto(int codigo, int cantidadAgregar){
 
 // 3. Pendiente por completar
 void Inventario::listarProductos(){
-    // Para completar con hash
+    
+    for(int i = 0; i < capacidadHash; i++){
+        Nodo* actual = tablaHash[i]; // frente de la lista de esta cubeta (copia: la tabla real no se mueve).
+        while(actual != nullptr){
+            printf("%d %s %d\n", actual->codigo, actual->nombre.c_str(), actual->cantidadDisponible);
+            actual = actual->siguienteProducto; // pasa al siguiente nodo de la misma cubeta.
+        }
+    }
+
 }
 
 Inventario::~Inventario(){

@@ -26,11 +26,17 @@ $$T(n) = \ldots \leq c \cdot n^2 \quad \text{para todo } n \geq k$$
 *Conclusión.* Por lo tanto, $T(n) \in O(n^2)$ con testigos $c = \ldots$
 y $k = \ldots$
 
-Resumen de costos:
-
-| Operación | Desde cero | De la biblioteca | Por qué |
+### Resumen de costos
+ 
+| Operación | Desde cero (tabla hash) | De la biblioteca (`std::map`) | Por qué |
 |---|---|---|---|
-|  |  |  |  |
+| `AGREGAR` | Peor caso $O(n)$; promedio $O(1+\alpha)$ | $O(\log n)$ | La tabla busca en una cubeta e inserta al frente en $O(1)$; el árbol balanceado tiene altura $O(\log n)$. |
+| `ELIMINAR` | Peor caso $O(n)$; promedio $O(1+\alpha)$ | $O(\log n)$ | La tabla recorre la cubeta dos veces como máximo; el árbol busca y rebalancea. |
+| `CONSULTAR` | Peor caso $O(n)$; promedio $O(1+\alpha)$ | $O(\log n)$ | Todo depende de la longitud de la cubeta: $\alpha$ en promedio y hasta $n$ si todos colisionan. |
+| `REPONER` | Peor caso $O(n)$; promedio $O(1+\alpha)$ | $O(\log n)$ | Búsqueda más una suma constante. |
+| `LISTAR` | $\Theta(M + n)$ | $\Theta(n)$ | La tabla visita las $M$ cubetas aunque estén vacías; el recorrido en orden del árbol visita cada nodo una vez. |
+ 
+Para comparar: la lista enlazada simple del avance costaba $O(n)$ en las cuatro operaciones de búsqueda y $\Theta(n)$ en `LISTAR`. La tabla con $M \geq n$ mejora la búsqueda en promedio, pero con colisión total vuelve a ese costo.
 
 ## 4. Experimentos
 

@@ -2,6 +2,12 @@
 
 ## 2026-11-16
 
+- Quiénes: Federico Galvez Gomez
+- Qué hicimos: Implementé el metodo `listarProductos`, y se inicio el desarrollo de `informe-final.md` empezando con `Resumen de costos:`.
+- Qué quedó pendiente: Terminar los apendices de `informe-final.md` y correcion del limite de caracteres.
+
+## 2026-11-16
+
 - Quiénes: Juan Felipe Durán Chaparro
 - Qué hicimos: Implementé los métodos `consultarProducto` y `reponerProducto` en la clase `Inventario` (tabla hash con encadenamiento) reutilizando `buscarProductoHash`[cite: 16]. Además, corregí la lectura en el `main` para validar los retornos de `scanf` y consumir el sobrante de caracteres en caso de que se ingresen nombres largos[cite: 10, 16].
 - Qué quedó pendiente: Implementar el método `listarProductos` en la tabla hash[cite: 16], mantener ambas estructuras (`InventarioLista` e `InventarioHash`) con la misma interfaz pública[cite: 4, 6], ejecutar los experimentos de rendimiento y redactar el informe final (`docs/informe-final.md`)[cite: 4, 13].
