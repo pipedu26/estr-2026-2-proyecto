@@ -139,7 +139,11 @@ void Inventario::reponerProducto(int codigo, int cantidadAgregar){
 
 // 3. Pendiente por completar
 void Inventario::listarProductos(){
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     for(int i = 0; i < capacidadHash; i++){
         Nodo* actual = tablaHash[i]; // frente de la lista de esta cubeta (copia: la tabla real no se mueve).
         while(actual != nullptr){
@@ -147,7 +151,10 @@ void Inventario::listarProductos(){
             actual = actual->siguienteProducto; // pasa al siguiente nodo de la misma cubeta.
         }
     }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 }
 
 Inventario::~Inventario(){
