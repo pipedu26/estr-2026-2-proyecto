@@ -212,14 +212,7 @@ Para comparar: la lista enlazada simple del avance costaba $O(n)$ en las cuatro 
 
 ## 4. Experimentos
 
-### 4.1 Entorno
-
-- **Máquina:** <procesador, núcleos y memoria; salida de `lscpu | grep "Model name"` y de `free -h`>
-- **Sistema operativo:** <salida de `uname -sr`>
-- **Compilador:** <salida de `g++ --version`>, con las banderas `-Wall -Wextra -O2`.
-- Todas las curvas salen de una sola ejecución de `./medicion` (`make medir`), en esa máquina y con ese compilador. Los datos crudos están en `datos/resultados.csv`.
-
-### 4.2 Qué se mide y cómo
+## Qué se mide y cómo
 
 Se mide el tiempo de `consultar`, que es lo que pide el escenario A. Los casos de `datos/` son demasiado pequeños para distinguir costos, así que las entradas se generan en `medicion.cpp`. Para cada $n \in \{1000, 2000, 4000, 8000, 16000, 32000\}$:
 
@@ -237,7 +230,7 @@ Las seis curvas son:
 - **Hash en una cubeta:** $M = 1009$ con códigos múltiplos de 1009, de modo que $c \bmod M = 0$ para todos.
 - **`map`:** el contenedor de referencia.
 
-### 4.3 Resultados
+### Resultados
 
 Tiempo por consulta en nanosegundos (ns), mediana de 7 repeticiones.
 
@@ -281,7 +274,7 @@ xychart-beta
 
 ## 5. Lo medido contra lo predicho
 
-### 5.1 Resumen
+### Resumen
 
 Un costo $\Theta(n)$ multiplica el tiempo por 2 al duplicar $n$; uno $\Theta(1)$ lo deja igual; uno $\Theta(\log n)$ lo multiplica por 1.1 aproximadamente en este rango. Factor medido al duplicar $n$:
 
@@ -293,7 +286,7 @@ Un costo $\Theta(n)$ multiplica el tiempo por 2 al duplicar $n$; uno $\Theta(1)$
 | Hash $M=n$ y $M=100003$ | $\Theta(1)$ | 1.00 a 1.07 | Sí |
 | `map` | $\Theta(\log n)$ | 1.06 a 1.41 | En parte: sube más de lo que predice $\log n$ |
 
-### 5.2 Donde no coincide del todo, y por qué
+### Donde no coincide del todo y por qué
 
 **La lista y la tabla en una cubeta tienen el mismo orden, pero una cuesta casi el doble.** Con $n = 32000$ la tabla en una cubeta tarda 1.88 veces más que la lista. La explicación sale de contar cuántos nodos se visitan ("pasos"). La lista inserta al final, así que los 2500 códigos existentes que se consultan están al **principio** y cada acierto cuesta poco. La cubeta inserta al frente, así que esos mismos códigos están al **final** y cada acierto cuesta casi $n$ pasos. Los fallos cuestan $n$ pasos en las dos. Para $n \geq 2500$ el promedio es de $\approx n/2 + 625$ pasos en la lista y de $\approx n - 625$ en la cubeta (para $n < 2500$ se contó directamente). Al dividir el tiempo medido entre esos pasos sale casi lo mismo en las dos:
 
@@ -312,15 +305,13 @@ Cada paso cuesta cerca de 1.1 ns en las dos estructuras. La diferencia entre ell
 
 **Hash con $M \geq n$: constante, pero con una condición.** El tiempo de 1.5 ns coincide con $\Theta(1)$: un módulo, un acceso a la tabla y a lo sumo un nodo. Es casi el piso de lo que la medición puede distinguir, así que solo se puede afirmar que no depende de $n$. Hay que decir que los códigos consecutivos $1, 2, \dots, n$ dan un reparto perfecto con $M \geq n$ (ninguna cubeta con más de un nodo). Eso no es lo que supone el Teorema 2 (hash uniforme simple, con colisiones al azar), y es el mejor caso posible para la tabla.
 
-**`map`.** Sube de 16.3 a 49.0 ns, un factor de 3.0, mientras que $\log_2 n$ solo pasa de 10 a 15 (factor de 1.5). El crecimiento es lógico en la forma, pero mayor en magnitud. Una explicación posible es que cada paso del árbol es un salto a otra dirección de memoria, y al crecer el árbol hay más fallos de caché. Tampoco se midió.
+**`map`.** Sube de 16.3 a 49.0 ns, un factor de 3.0, mientras que $\log_2 n$ solo pasa de 10 a 15 (factor de 1.5). El crecimiento es lógico en la forma, pero mayor en magnitud. Una explicación posible es que cada paso del árbol es un salto a otra dirección de memoria.
 
-### 5.3 Limitaciones
+### Limitaciones
 
 - Solo se midió `consultar`. El análisis de `agregar`, `eliminar`, `reponer` y `listar` queda sin contraste experimental.
-- Los 2500 códigos existentes que se consultan son siempre los primeros cargados. Eso favorece a la lista y perjudica a la tabla (véase 5.2). Con códigos repartidos en todo el rango, la lista costaría cerca de $3n/4$ pasos.
+- Los 2500 códigos existentes que se consultan son siempre los primeros cargados. Eso favorece a la lista y perjudica a la tabla. Con códigos repartidos en todo el rango, la lista costaría cerca de $3n/4$ pasos.
 - Una sola ejecución en una sola máquina, con la mediana de 7 repeticiones y sin medir la dispersión.
-- Las explicaciones con caché son hipótesis. Se podrían comprobar con un contador de fallos de caché (`perf stat -e cache-misses`).
-
 
 
 
