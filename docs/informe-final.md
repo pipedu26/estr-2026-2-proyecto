@@ -320,3 +320,28 @@ Cada paso cuesta cerca de 1.1 ns en las dos estructuras. La diferencia entre ell
 - Los 2500 códigos existentes que se consultan son siempre los primeros cargados. Eso favorece a la lista y perjudica a la tabla (véase 5.2). Con códigos repartidos en todo el rango, la lista costaría cerca de $3n/4$ pasos.
 - Una sola ejecución en una sola máquina, con la mediana de 7 repeticiones y sin medir la dispersión.
 - Las explicaciones con caché son hipótesis. Se podrían comprobar con un contador de fallos de caché (`perf stat -e cache-misses`).
+
+
+
+
+## 6. Conclusiones
+ 
+**Cuál estructura conviene.** Para este escenario, donde casi todas las operaciones buscan un artículo por su código exacto, conviene la **tabla hash con encadenamiento y un número de cubetas $M$ no menor que el número de artículos**. En las mediciones tardó unos 1.5 ns por consulta, sin depender de $n$ entre 1000 y 32000. Con $n = 32000$ es unas 30 veces más rápida que `std::map` (1.6 contra 49.0 ns) y unas 12000 veces más rápida que la lista del avance (19555.1 ns). Eso coincide con lo que predice el análisis de la sección 3: $O(1 + \alpha)$ en promedio, con $\alpha \leq 1$.
+ 
+La lista enlazada simple, que cumplió su papel como estructura del avance y como cubeta de la tabla, no es competitiva por sí sola: su costo crece linealmente y con $n = 1000$ ya es unas 500 veces más lenta que la tabla. `std::map` es una alternativa razonable y robusta: crece despacio (de 16.3 a 49.0 ns) y no necesita elegir $M$.
+ 
+**Con qué cuidado leer este resultado.**
+ 
+- Los códigos usados con $M \geq n$ fueron consecutivos, lo que da un reparto perfecto (ninguna cubeta con más de un nodo). Es el mejor caso de la tabla y no el hash uniforme al azar del Teorema 2. Los 1.5 ns están además cerca del mínimo que la medición distingue, de modo que solo se puede afirmar que no dependen de $n$.
+- Con estos códigos no se distingue $M = n$ de $M = 100003$ (primo): ambos dan lo mismo, así que la medición no permite concluir que el primo mejore el reparto.
+- Solo se midió `consultar`; el contraste experimental de las demás operaciones queda pendiente (sección 5.3).
+
+**Bajo qué condiciones cambiaría la respuesta.**
+ 
+- **Si $M$ queda pequeño y fijo mientras el inventario crece.** La tabla pierde su ventaja: con $M = 11$ el tiempo crece linealmente y fue más lento que `std::map` en todos los tamaños medidos (6.4 veces con $n = 1000$ y 92.7 veces con $n = 32000$). La tabla de este proyecto no se redimensiona, así que $M$ debe escogerse de antemano con el tamaño esperado del inventario, o habría que agregar un rehash al crecer $\alpha$.
+- **Si los códigos colisionan con $M$.** Con todos los códigos en una cubeta la tabla se degrada a la lista y fue unas 750 veces más lenta que `std::map` con $n = 32000$ (36720.6 contra 49.0 ns). `std::map` solo compara códigos, así que por su cota $O(\log n)$ no debería verse afectado por este tipo de claves, aunque no se midió con ellas.
+- **Si se necesita `LISTAR` en orden por código con frecuencia.** `std::map` entrega el orden ya hecho en $\Theta(n)$; la tabla debe copiar y ordenar, $\Theta(M + n\log n)$ (secciones 2.2 y 3). Si el orden importa más que la velocidad de consulta, `std::map` gana.
+- **Si la memoria es una restricción.** La tabla reserva $M$ apuntadores aunque haya pocos artículos: con $M = 100003$ son unos 0.8 MB si cada apuntador ocupa 8 bytes, mientras que `std::map` solo usa memoria por los nodos presentes.
+
+**En resumen:** tabla hash con $M$ del orden de $n$ o mayor cuando lo que más importa es consultar, reponer, agregar y eliminar por código; `std::map` cuando se necesita el orden por código, cuando no se conoce el tamaño del inventario o cuando las claves podrían colisionar con $M$.
+ 

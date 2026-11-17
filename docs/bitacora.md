@@ -2,6 +2,12 @@
 
 ## 2026-11-16
 
+- Quiénes: Federico Galvez Gomez
+- Qué hicimos: Punto 6 o Concluciones
+- Qué quedó pendiente: revicion 
+
+## 2026-11-16
+
 - Quiénes: Carlos Rojas
 - Qué hicimos: Subida de la parte 4 y 5 del `informe-final.md`.
 - Qué quedó pendiente:  El punto 6.
