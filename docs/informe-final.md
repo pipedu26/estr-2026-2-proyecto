@@ -212,6 +212,111 @@ Para comparar: la lista enlazada simple del avance costaba $O(n)$ en las cuatro 
 
 ## 4. Experimentos
 
+### 4.1 Entorno
+
+- **Máquina:** <procesador, núcleos y memoria; salida de `lscpu | grep "Model name"` y de `free -h`>
+- **Sistema operativo:** <salida de `uname -sr`>
+- **Compilador:** <salida de `g++ --version`>, con las banderas `-Wall -Wextra -O2`.
+- Todas las curvas salen de una sola ejecución de `./medicion` (`make medir`), en esa máquina y con ese compilador. Los datos crudos están en `datos/resultados.csv`.
+
+### 4.2 Qué se mide y cómo
+
+Se mide el tiempo de `consultar`, que es lo que pide el escenario A. Los casos de `datos/` son demasiado pequeños para distinguir costos, así que las entradas se generan en `medicion.cpp`. Para cada $n \in \{1000, 2000, 4000, 8000, 16000, 32000\}$:
+
+1. Se crea la estructura y se cargan $n$ artículos con códigos $p, 2p, \dots, np$ ($p = 1$, salvo en el cuarto juego de claves). La carga no se cronometra.
+2. Se prepara de antemano un arreglo de 5000 códigos que alterna uno existente y uno inexistente. Los existentes son los primeros 2500 cargados ($p, 2p, \dots, 2500p$, o los $n$ si $n < 2500$).
+3. Una pasada de calentamiento verifica que se encuentren exactamente 2500 códigos y llena la caché.
+4. Con `std::chrono::steady_clock` se cronometra el ciclo de 5000 consultas y se divide entre 5000. Se repite 7 veces y se reporta la **mediana**, en nanosegundos por consulta.
+
+Las seis curvas son:
+
+- **Lista:** la estructura del avance.
+- **Hash $M=11$:** tabla pequeña.
+- **Hash $M=n$:** tamaño cercano al número de artículos (se recrea para cada $n$).
+- **Hash $M=100003$:** primo mayor que todos los $n$.
+- **Hash en una cubeta:** $M = 1009$ con códigos múltiplos de 1009, de modo que $c \bmod M = 0$ para todos.
+- **`map`:** el contenedor de referencia.
+
+### 4.3 Resultados
+
+Tiempo por consulta en nanosegundos (ns), mediana de 7 repeticiones.
+
+| $n$ | Lista | Hash $M=11$ | Hash $M=n$ | Hash $M=100003$ | Hash en una cubeta | `map` |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 794.2 | 103.9 | 1.5 | 1.5 | 843.3 | 16.3 |
+| 2000 | 1539.2 | 232.0 | 1.5 | 1.5 | 1675.3 | 18.9 |
+| 4000 | 2841.5 | 425.0 | 1.6 | 1.5 | 3544.8 | 20.0 |
+| 8000 | 4918.6 | 905.3 | 1.5 | 1.5 | 7884.4 | 26.1 |
+| 16000 | 9481.5 | 2037.7 | 1.6 | 1.5 | 16697.5 | 34.7 |
+| 32000 | 19555.1 | 4542.5 | 1.6 | 1.6 | 36720.6 | 49.0 |
+
+Todas las curvas. De la más alta a la más baja al final: lista, hash en una cubeta, hash $M=11$, `map`, y las dos de hash con $M$ grande, que quedan pegadas al eje.
+
+```mermaid
+xychart-beta
+    title "Tiempo por consulta contra n"
+    x-axis [1000, 2000, 4000, 8000, 16000, 32000]
+    y-axis "ns por consulta" 0 --> 40000
+    line [794.2, 1539.2, 2841.5, 4918.6, 9481.5, 19555.1]
+    line [843.3, 1675.3, 3544.8, 7884.4, 16697.5, 36720.6]
+    line [103.9, 232.0, 425.0, 905.3, 2037.7, 4542.5]
+    line [16.3, 18.9, 20.0, 26.1, 34.7, 49.0]
+    line [1.5, 1.5, 1.6, 1.5, 1.6, 1.6]
+    line [1.5, 1.5, 1.5, 1.5, 1.5, 1.6]
+```
+
+Orden de las líneas: lista, hash en una cubeta, hash $M=11$, `map`, hash $M=n$, hash $M=100003$.
+
+Ampliación de las curvas que casi no crecen (orden: hash $M=n$, hash $M=100003$, `map`):
+
+```mermaid
+xychart-beta
+    title "Ampliación: hash con M grande contra map"
+    x-axis [1000, 2000, 4000, 8000, 16000, 32000]
+    y-axis "ns por consulta" 0 --> 60
+    line [1.5, 1.5, 1.6, 1.5, 1.6, 1.6]
+    line [1.5, 1.5, 1.5, 1.5, 1.5, 1.6]
+    line [16.3, 18.9, 20.0, 26.1, 34.7, 49.0]
+```
+
 ## 5. Lo medido contra lo predicho
 
-## 6. Conclusiones
+### 5.1 Resumen
+
+Un costo $\Theta(n)$ multiplica el tiempo por 2 al duplicar $n$; uno $\Theta(1)$ lo deja igual; uno $\Theta(\log n)$ lo multiplica por 1.1 aproximadamente en este rango. Factor medido al duplicar $n$:
+
+| Curva | Predicción | Factor medido | ¿Coincide? |
+|---|---|---|---|
+| Lista | $\Theta(n)$ | 1.73 a 2.06 | Sí |
+| Hash $M=11$ | $\Theta(n/M)$, lineal | 1.83 a 2.25 | Sí en la forma; la pendiente se discute en 5.2 |
+| Hash en una cubeta | $\Theta(n)$ | 1.99 a 2.22 | Sí |
+| Hash $M=n$ y $M=100003$ | $\Theta(1)$ | 1.00 a 1.07 | Sí |
+| `map` | $\Theta(\log n)$ | 1.06 a 1.41 | En parte: sube más de lo que predice $\log n$ |
+
+### 5.2 Donde no coincide del todo, y por qué
+
+**La lista y la tabla en una cubeta tienen el mismo orden, pero una cuesta casi el doble.** Con $n = 32000$ la tabla en una cubeta tarda 1.88 veces más que la lista. La explicación sale de contar cuántos nodos se visitan ("pasos"). La lista inserta al final, así que los 2500 códigos existentes que se consultan están al **principio** y cada acierto cuesta poco. La cubeta inserta al frente, así que esos mismos códigos están al **final** y cada acierto cuesta casi $n$ pasos. Los fallos cuestan $n$ pasos en las dos. Para $n \geq 2500$ el promedio es de $\approx n/2 + 625$ pasos en la lista y de $\approx n - 625$ en la cubeta (para $n < 2500$ se contó directamente). Al dividir el tiempo medido entre esos pasos sale casi lo mismo en las dos:
+
+| $n$ | Lista: pasos | Lista: ns por paso | Una cubeta: pasos | Una cubeta: ns por paso |
+|---:|---:|---:|---:|---:|
+| 1000 | 725 | 1.10 | 775 | 1.09 |
+| 2000 | 1425 | 1.08 | 1575 | 1.06 |
+| 4000 | 2625 | 1.08 | 3375 | 1.05 |
+| 8000 | 4625 | 1.06 | 7375 | 1.07 |
+| 16000 | 8625 | 1.10 | 15375 | 1.09 |
+| 32000 | 16625 | 1.18 | 31375 | 1.17 |
+
+Cada paso cuesta cerca de 1.1 ns en las dos estructuras. La diferencia entre ellas viene de **cuántos pasos** da cada una con estos códigos, no de la caché. Esto también explica que el factor de la cubeta pase de 2 (con $n=4000$ da 2.12, como $(2n-625)/(n-625)$): los pasos crecen un poco más rápido que $n$. El ligero aumento a 1.17 y 1.18 ns por paso con $n = 32000$ podría deberse a que la lista deja de caber en la caché más rápida, pero eso es una hipótesis que no se midió.
+
+**La tabla con $M=11$ no es 11 veces mejor que la lista.** Lo predicho era $\Theta(n/M)$, y la forma lineal se cumple. Pero la lista es 7.6 veces más lenta con $n=1000$ y solo 4.3 veces con $n=32000$. Hay dos causas. Primera: en esta medición los aciertos de la lista son baratos (están al frente) y los de la tabla caros (están al final de su cubeta), así que la razón entre pasos es de unas 10 veces con $n=1000$ y de unas 5.8 con $n=32000$, no de 11. Segunda: cada paso en la tabla cuesta más, entre 1.4 y 1.6 ns por paso (estimado). Una explicación posible es que los nodos de una misma cubeta quedan separados en memoria, uno de cada 11 reservados, y se aprovecha peor la caché. Es una hipótesis.
+
+**Hash con $M \geq n$: constante, pero con una condición.** El tiempo de 1.5 ns coincide con $\Theta(1)$: un módulo, un acceso a la tabla y a lo sumo un nodo. Es casi el piso de lo que la medición puede distinguir, así que solo se puede afirmar que no depende de $n$. Hay que decir que los códigos consecutivos $1, 2, \dots, n$ dan un reparto perfecto con $M \geq n$ (ninguna cubeta con más de un nodo). Eso no es lo que supone el Teorema 2 (hash uniforme simple, con colisiones al azar), y es el mejor caso posible para la tabla.
+
+**`map`.** Sube de 16.3 a 49.0 ns, un factor de 3.0, mientras que $\log_2 n$ solo pasa de 10 a 15 (factor de 1.5). El crecimiento es lógico en la forma, pero mayor en magnitud. Una explicación posible es que cada paso del árbol es un salto a otra dirección de memoria, y al crecer el árbol hay más fallos de caché. Tampoco se midió.
+
+### 5.3 Limitaciones
+
+- Solo se midió `consultar`. El análisis de `agregar`, `eliminar`, `reponer` y `listar` queda sin contraste experimental.
+- Los 2500 códigos existentes que se consultan son siempre los primeros cargados. Eso favorece a la lista y perjudica a la tabla (véase 5.2). Con códigos repartidos en todo el rango, la lista costaría cerca de $3n/4$ pasos.
+- Una sola ejecución en una sola máquina, con la mediana de 7 repeticiones y sin medir la dispersión.
+- Las explicaciones con caché son hipótesis. Se podrían comprobar con un contador de fallos de caché (`perf stat -e cache-misses`).
