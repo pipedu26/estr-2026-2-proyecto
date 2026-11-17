@@ -2,6 +2,12 @@
 
 ## 2026-11-16
 
+- Quiénes: Carlos Rojas
+- Qué hicimos: Aseguramos hasta los casos de codigo negativo. Se cambio la estructura de los codigos, separandolos en .h, cada uno para una estructura, lista, hash y map, cabe aclarar que ahora las funciones devuelven un boleano. Para poder usar un solo main que ejecute los 3 .h y asi poder sacar los tiempos de ejecución. Se creo un archivo medicion que crea muchos productos y tambien modifica la capacidad de la cubeta para poder ver como cambian los tiempos
+- Qué quedó pendiente: El punto 4 y 5 del informe.
+
+## 2026-11-16
+
 - Quiénes: Federico Galvez Gomez
 - Qué hicimos: Implementé el metodo `listarProductos`, y se inicio el desarrollo de `informe-final.md` empezando con `Resumen de costos:`.
 - Qué quedó pendiente: Terminar los apendices de `informe-final.md` y correcion del limite de caracteres.
